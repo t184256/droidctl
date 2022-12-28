@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: 2022 Alexander Sosedkin <monk@unboiled.info>
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import sys
+
 import ppadb.client
 import uiautomator
 
@@ -34,3 +36,11 @@ class Device:
 
         # Attach fdroidcl functionality under .fdroid
         self.fdroid = droidctl.fdroid.FDroidCL(id_c)
+
+    def __call__(self, cmd, **kwa):
+        r = self.adb.shell(f'({cmd}) && echo - success', **kwa)
+        if not r.endswith('- success\n'):
+            print(f'Execution of command {cmd} has failed:')
+            print(r)
+            sys.exit(1)
+        return r.removesuffix('- success\n')

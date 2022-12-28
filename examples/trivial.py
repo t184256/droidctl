@@ -4,3 +4,4 @@ def run(d):
           d.adb.is_installed('com.android.vending'))
     print('Orientation:', d.ui.orientation)
     assert d.adb.is_installed('com.github.uiautomator')  # gets autoinstalled
+    assert d('echo test') == 'test\n'
