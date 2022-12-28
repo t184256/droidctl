@@ -5,9 +5,19 @@ class Settings:
     def __init__(self, d):
         self._d = d
 
-    def __setattr__(self, name, val):
-        self._d(f'settings put global "{name}" "{val}"')
-        assert self._d(f'settings get global "{name}"') == str(val)
+    def __getitem__(self, namespace):
+        return SettingsProxy(self._d, namespace)
 
-    def __getattr__(self, name):
-        return self._d(f'settings get global "{name}"')
+
+class SettingsProxy:
+    def __init__(self, d, namespace):
+        self.__d = d
+        self.__ns = namespace
+
+    def __getitem__(self, name):
+        v = self.__d(f'settings get "{self.__ns}" "{name}"').removesuffix('\n')
+        return v
+
+    def __setitem__(self, name, val):
+        self.__d(f'settings put "{self.__ns}" "{name}" "{val}"')
+        assert self[name] == str(val)

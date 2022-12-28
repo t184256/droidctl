@@ -7,6 +7,7 @@ import ppadb.client
 import uiautomator
 
 import droidctl.fdroid
+import droidctl.settings
 
 
 class Device:
@@ -14,7 +15,8 @@ class Device:
     # all useful things are namespaced under the following attributes:
     adb = None  # adb functionality
     ui = None  # uiautomator functionality
-    fdroid = None  # fdroid functionality
+    fdroid = None  # fdroid functionality, backed by fdroidcl
+    settings = None  # settings functionality, backed by adb commands
 
     def __init__(self, id_=None):
         # List devices through adb
@@ -36,6 +38,9 @@ class Device:
 
         # Attach fdroidcl functionality under .fdroid
         self.fdroid = droidctl.fdroid.FDroidCL(id_c)
+
+        # Attach adb settings functionality under .settings
+        self.settings = droidctl.settings.Settings(self)
 
     def __call__(self, cmd, **kwa):
         r = self.adb.shell(f'({cmd}) && echo - success', **kwa)
