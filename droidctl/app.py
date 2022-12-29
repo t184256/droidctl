@@ -7,8 +7,8 @@ Allows writing concise scripts that do something with Android devices:
 install apps, click through menus to configure settings, etc.
 """
 
-import importlib.machinery
 import os
+import sys
 
 import click
 
@@ -23,32 +23,28 @@ def cli():
     pass
 
 
-def _print_header(s, **kwa):
-    l = len(s)
-    print('- ' + s + ((' ' + '-' * (80 - 3 - l)) if l < 80 - 3 else ''), **kwa)
-
-
 @cli.command()
 @click.argument('script', nargs=-1, required=True,
                 type=click.Path(readable=True))
+@click.option('--root', type=click.Path(readable=True),
+              help='path to resolving imports in scripts')
 @click.option('--preamble', type=click.Path(readable=True),
               help='preamble script')
 @click.option('--device', type=click.STRING, help='ADB device id')
-def run(script, preamble, device):
+def run(script, preamble, device, root):
+    # simplify importing for scripts
+    bak_path = sys.path
+    root = root or os.getcwd()
+    sys.path.append(root)
+
     d = droidctl.device.Device(device)
 
     # Load preamble
     if preamble:
-        p = importlib.machinery.SourceFileLoader(
-            'preamble', preamble
-        ).load_module()
-        assert 'preamble' in dir(p), f'Preamble file {p} lacks preamble(d)!'
-        _print_header(f'Executing preamble {preamble} against {d.name}')
-        assert 'preamble' in dir(p), f'preamble {p} lacks prealmble(d)!'
-        d = p.preamble(d) or d
+        d = d.apply(preamble, _func='preamble')
     for s in script:
-        s_name, _ = os.path.splitext(os.path.basename(s))
-        module = importlib.machinery.SourceFileLoader(s_name, s).load_module()
-        assert 'run' in dir(module), f'module {s_name} lacks run(d)!'
-        _print_header(f'Executing {s_name} against {d.name}')
-        d = module.run(d) or d
+        d = d.apply(s, _func='run')
+
+    sys.path.remove(root)
+    assert sys.path == bak_path
+    return d

@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: 2022 Alexander Sosedkin <monk@unboiled.info>
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import importlib.machinery
+import os
 import sys
 
 import ppadb.client
@@ -8,6 +10,7 @@ import uiautomator
 
 import droidctl.fdroid
 import droidctl.settings
+import droidctl.util
 
 
 class Device:
@@ -49,3 +52,6 @@ class Device:
             print(r)
             sys.exit(1)
         return r.removesuffix('- success\n')
+
+    def apply(self, path, *args, _func='run', **kwargs):
+        return droidctl.util.apply(self, path, *args, _func=_func, **kwargs)
