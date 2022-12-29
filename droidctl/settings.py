@@ -21,3 +21,8 @@ class SettingsProxy:
     def __setitem__(self, name, val):
         self.__d(f'settings put "{self.__ns}" "{name}" "{val}"')
         assert self[name] == str(val)
+
+    def __contains__(self, name):
+        # TODO: faster way?
+        r = '\n' + self.__d(f'settings list "{self.__ns}"')
+        return f'\n{name}=' in r
