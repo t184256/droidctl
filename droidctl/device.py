@@ -40,7 +40,7 @@ class Device:
         self.ui = uiautomator.Device(id_c)
 
         # Attach fdroidcl functionality under .fdroid
-        self.fdroid = droidctl.fdroid.FDroidCL(id_c)
+        self.fdroid = droidctl.fdroid.FDroidCL(self, id_c)
 
         # Attach adb settings functionality under .settings
         self.settings = droidctl.settings.Settings(self)
