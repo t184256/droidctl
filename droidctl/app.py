@@ -45,6 +45,9 @@ class App:
             self._d.adb.uninstall(self.id_)
         assert not self.is_installed()
 
+    def clear(self):
+        self._d(f'pm clear {self.id_}')
+
     def allow_notifications(self):
         self._d(f'pm set-permission-flags {self.id_}'
                 ' android.permission.POST_NOTIFICATIONS user-set')
