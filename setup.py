@@ -19,7 +19,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'droidctl = droidctl.app:cli',
+            'droidctl = droidctl.cli:cli',
         ],
     },
 )

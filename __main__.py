@@ -1,3 +1,3 @@
-import droidctl.app
+import droidctl.cli
 
-droidctl.app.cli()
+droidctl.cli.cli()
