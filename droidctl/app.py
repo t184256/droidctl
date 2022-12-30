@@ -3,19 +3,21 @@
 
 import contextlib
 import tempfile
+import time
 import xml.etree.ElementTree as ET
 
 
 class App:
-    def __init__(self, d, id_, store=None, autoinstall=True):
+    def __init__(self, d, id_, store=None, url=None, autoinstall=True):
         # TODO: somehow ensure it's the right device ID
         # only thing fdroidcl ensures is the amount of devices
         self._d = d
         self.id_ = id_
         self.store = store
+        self.url = url
         self.shared_prefs = SharedPrefs(d, id_)
 
-        if store is not None and autoinstall:
+        if autoinstall and (store or url):
             self.install()
 
     def is_installed(self):
@@ -23,11 +25,16 @@ class App:
         return self.id_ in self._d.adb.list_packages()
 
     def install(self):
+        if self.is_installed():
+            return
+
         if self.store is not None:
             if not self.is_installed():
                 self.store.install(self.id_)
+        elif self.url is not None:
+            self._d.adb.install(self.url)
         else:
-            raise NotImplementedError('store not specified,'
+            raise NotImplementedError('neither store nor url are specified,'
                                       f' cannot install {self.id_}')
         assert self.is_installed()
 
