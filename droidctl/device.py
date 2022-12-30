@@ -8,6 +8,7 @@ import sys
 import adbutils
 import uiautomator2
 
+import droidctl.app
 import droidctl.fdroid
 import droidctl.settings
 import droidctl.util
@@ -52,6 +53,9 @@ class Device:
             print(r.output)
             sys.exit(1)
         return r
+
+    def app(self, *a, **kwa):
+        return droidctl.app.App(self, *a, **kwa)
 
     def apply(self, path, *args, _func='run', **kwargs):
         return droidctl.util.apply(self, path, *args, _func=_func, **kwargs)
