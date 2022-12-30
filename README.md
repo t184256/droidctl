@@ -1,6 +1,8 @@
 # droidctl
 
 A helper to control Android devices with scripts.
+Combines `uiautomator2`, `adbutils` and `fdroidcl` powers
++ some more high-level interfaces.
 See examples in `examples` to get the idea of what I'm aiming for.
 
 Invocation examples:

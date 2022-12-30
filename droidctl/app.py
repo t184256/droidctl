@@ -14,7 +14,8 @@ class App:
             self.install()
 
     def is_installed(self):
-        return self._d.adb.is_installed(self.id_)
+        # TODO: something faster?
+        return self.id_ in self._d.adb.list_packages()
 
     def install(self):
         if self.store is not None:

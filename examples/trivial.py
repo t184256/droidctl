@@ -1,6 +1,6 @@
 def run(d):
     print(f'Running against device {d.name}')
     print('Google Play is installed:',
-          d.adb.is_installed('com.android.vending'))
+          'com.android.vending' in d.adb.list_packages())
     print('Orientation:', d.ui.orientation)
     assert d('echo test') == 'test\n'

@@ -16,7 +16,6 @@ setup(
     install_requires=[
         'uiautomator2',
         'adbutils',
-        'pure-python-adb',
     ],
     entry_points={
         'console_scripts': [

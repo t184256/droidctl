@@ -119,7 +119,6 @@
           src = ./.;
           propagatedBuildInputs = with pkgs.python3Packages; [
             uiautomator2
-            pure-python-adb
             click
             fdroidcl
           ] ++ (with pkgs; [
@@ -132,14 +131,12 @@
           droidctl
           click
           uiautomator2
-          pure-python-adb
         ]);
 
         devShell = pkgs.mkShell {
           buildInputs = [
             (pkgs.python3.withPackages (ps: with ps; [
               click
-              pure-python-adb
               uiautomator2
             ]))
             fdroidcl

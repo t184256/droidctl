@@ -5,7 +5,7 @@ import importlib.machinery
 import os
 import sys
 
-import ppadb.client
+import adbutils
 import uiautomator2
 
 import droidctl.fdroid
@@ -16,21 +16,21 @@ import droidctl.util
 class Device:
     name = None  # can be set to pretty name in preamble, defaults to adb id
     # all useful things are namespaced under the following attributes:
-    adb = None  # adb functionality
+    adb = None  # adbutils functionality
     ui = None  # uiautomator2 functionality
     fdroid = None  # fdroid functionality, backed by fdroidcl
     settings = None  # settings functionality, backed by adb commands
 
     def __init__(self, id_=None):
         # List devices through adb
-        adb = ppadb.client.Client()
-        devices = adb.devices()
+        adb = adbutils.AdbClient()
+        devices = adb.device_list()
         # Ensure there's just one
         assert len(devices) > 0, 'No devices found!'
         assert len(devices) == 1, 'More than one device found!'
         # Attach adb functionality under .adb
         self.adb = devices[0]
-        id_c = self.adb.get_serial_no()
+        id_c = self.adb.serial
         # Ensure it's the right one
         if id_:
             assert id_c == id_, f'Wrong device {id_c} is not {id_}!'
