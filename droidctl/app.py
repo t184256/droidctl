@@ -62,8 +62,11 @@ class App:
     def launch(self, wait=True):
         self._d.ui.app_start(self.id_)
         if wait:
-            while self._d.ui.info['currentPackageName'] != self.id_:
-                time.sleep(.25)
+            self.wait()
+
+    def wait(self):
+        while self._d.ui.info['currentPackageName'] != self.id_:
+            time.sleep(.25)
 
 
 class SharedPrefs:
