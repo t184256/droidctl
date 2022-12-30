@@ -47,11 +47,9 @@
         adbutils = pkgs.python3Packages.buildPythonPackage rec {
           pname = "adbutils";
           version = "1.2.2";
-          src = pkgs.fetchFromGitHub {
-            owner = "openatx";
-            repo = "adbutils";
-            rev = version;
-            sha256 = "sha256-VOp2Is8IrhUF4nPwpVtR+/ZjyQQsQ3gvCS2C2w3Sbeo";
+          src = pkgs.python3Packages.fetchPypi {
+            inherit pname version;
+            sha256 = "sha256-6lnnr+4gqBlHDM2whbK+/OjWhhyrwLXAWpaFDj0w980=";
           };
           propagatedBuildInputs = with pkgs.python3Packages; [
             pbr
@@ -68,11 +66,9 @@
         uiautomator2 = pkgs.python3Packages.buildPythonPackage rec {
           pname = "uiautomator2";
           version = "2.16.12";
-          src = pkgs.fetchFromGitHub {
-            owner = "openatx";
-            repo = "uiautomator2";
-            rev = version;
-            sha256 = "sha256-j4BU6w7Lj6RalsFGL5qk45q2gkjv5vDcQC69pIwVqRk=";
+          src = pkgs.python3Packages.fetchPypi {
+            inherit pname version;
+            sha256 = "sha256-hL1JdmlAkUnRRRersAN2zZQ8iwGhb970zslPU+u7lCk=";
           };
           prePatch = ''
             substituteInPlace requirements.txt \
