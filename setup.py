@@ -14,7 +14,8 @@ setup(
         'droidctl',
     ],
     install_requires=[
-        'uiautomator',
+        'uiautomator2',
+        'adbutils',
         'pure-python-adb',
     ],
     entry_points={

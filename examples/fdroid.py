@@ -7,3 +7,6 @@ def run(d):
                        'de.onyxbits.sensorreadout')
     assert not d.adb.is_installed('com.simplemobiletools.thankyou')
     assert not d.adb.is_installed('de.onyxbits.sensorreadout')
+
+    # Or, much terser and with rich App objects
+    d.fdroid['com.simplemobiletools.thankyou'].uninstall()

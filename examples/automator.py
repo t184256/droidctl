@@ -1,3 +1,3 @@
 def run(d):
     d.adb.shell('am start -a android.settings.SETTINGS')
-    d.ui.press.home()
+    d.ui.press('home')

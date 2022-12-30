@@ -6,7 +6,7 @@ import os
 import sys
 
 import ppadb.client
-import uiautomator
+import uiautomator2
 
 import droidctl.fdroid
 import droidctl.settings
@@ -17,7 +17,7 @@ class Device:
     name = None  # can be set to pretty name in preamble, defaults to adb id
     # all useful things are namespaced under the following attributes:
     adb = None  # adb functionality
-    ui = None  # uiautomator functionality
+    ui = None  # uiautomator2 functionality
     fdroid = None  # fdroid functionality, backed by fdroidcl
     settings = None  # settings functionality, backed by adb commands
 
@@ -36,8 +36,8 @@ class Device:
             assert id_c == id_, f'Wrong device {id_c} is not {id_}!'
         self.name = id_c
 
-        # Attach uiautomator functionality under .ui
-        self.ui = uiautomator.Device(id_c)
+        # Attach uiautomator2 functionality under .ui
+        self.ui = uiautomator2.connect(id_c)
 
         # Attach fdroidcl functionality under .fdroid
         self.fdroid = droidctl.fdroid.FDroidCL(self, id_c)

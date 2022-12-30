@@ -11,20 +11,90 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
-        # uiautomator
-        uiautomator = pkgs.python3Packages.buildPythonPackage {
-          pname = "uiautomator";
-          version = "20201016";
-          src = pkgs.fetchFromGitHub {
-            owner = "xiaocong";
-            repo = "uiautomator";
-            rev = "ddef372b5bd3811f196290a1f75b636c6be9da2b";
-            sha256 = "sha256-tSgI7JAhBU5oYXrv1KjZx4ZgIX2y1qw9W7XbYNKs0RI=";
+        # cigam, needed by apkutils2
+        cigam = pkgs.python3Packages.buildPythonPackage rec {
+          pname = "cigam";
+          version = "0.0.3";
+          src = pkgs.python3Packages.fetchPypi {
+            inherit pname version;
+            sha256 = "sha256-j89l1zYfA3LFN4DoYTB6vR8RqUtiBPplO6PzgneCJ4M=";
+            format = "wheel";
+            dist = "py3";
+            python = "py3";
+          };
+          format = "wheel";
+        };
+
+        # apkutils2, dependency of adbutils
+        apkutils2 = pkgs.python3Packages.buildPythonPackage rec {
+          pname = "apkutils2";
+          version = "1.0.0";
+          src = pkgs.python3Packages.fetchPypi {
+            inherit pname version;
+            sha256 = "sha256-xa6PhtPr7mpZ/AFNiFB3Qdfz+asYO6s0tE0BH+h4Zgs=";
           };
           propagatedBuildInputs = with pkgs.python3Packages; [
-            urllib3
+            cigam
+            pyelftools
+            xmltodict
+            pillow
+            retry
           ];
           doCheck = false;
+        };
+
+        # adbutils, dependency of uiautomator2
+        adbutils = pkgs.python3Packages.buildPythonPackage rec {
+          pname = "adbutils";
+          version = "1.2.2";
+          src = pkgs.fetchFromGitHub {
+            owner = "openatx";
+            repo = "adbutils";
+            rev = version;
+            sha256 = "sha256-VOp2Is8IrhUF4nPwpVtR+/ZjyQQsQ3gvCS2C2w3Sbeo";
+          };
+          propagatedBuildInputs = with pkgs.python3Packages; [
+            pbr
+            deprecation
+            whichcraft
+            requests
+            apkutils2
+          ];
+          PBR_VERSION = version;
+          doCheck = false;
+        };
+
+        # uiautomator2
+        uiautomator2 = pkgs.python3Packages.buildPythonPackage rec {
+          pname = "uiautomator2";
+          version = "2.16.12";
+          src = pkgs.fetchFromGitHub {
+            owner = "openatx";
+            repo = "uiautomator2";
+            rev = version;
+            sha256 = "sha256-j4BU6w7Lj6RalsFGL5qk45q2gkjv5vDcQC69pIwVqRk=";
+          };
+          prePatch = ''
+            substituteInPlace requirements.txt \
+              --replace 'packaging~=20.3' 'packaging~=21.1'
+            substituteInPlace requirements.txt \
+              --replace 'adbutils>=0.11.0,<1.0' 'adbutils~=1.2'
+          '';
+          propagatedBuildInputs = with pkgs.python3Packages; [
+            adbutils
+            pbr
+            urllib3
+            filelock
+            packaging
+            lxml
+            logzero
+            progress
+            cached-property
+            six
+            deprecated
+          ];
+          doCheck = false;
+          PBR_VERSION = version;
         };
 
         # fdroidcl
@@ -48,7 +118,7 @@
           version = "0.0.1";
           src = ./.;
           propagatedBuildInputs = with pkgs.python3Packages; [
-            uiautomator
+            uiautomator2
             pure-python-adb
             click
             fdroidcl
@@ -61,7 +131,7 @@
         pythonEnv = pkgs.python3.withPackages (ps: with ps; [
           droidctl
           click
-          uiautomator
+          uiautomator2
           pure-python-adb
         ]);
 
@@ -70,7 +140,7 @@
             (pkgs.python3.withPackages (ps: with ps; [
               click
               pure-python-adb
-              uiautomator
+              uiautomator2
             ]))
             fdroidcl
           ];
@@ -83,7 +153,10 @@
           fdroidcl = fdroidclApp;
           default = droidctl;
         };
-        packages = { inherit uiautomator fdroidcl droidctl; };
+        packages = {
+          inherit adbutils uiautomator2 fdroidcl droidctl;
+          default = droidctl;
+        };
       in
       {
         inherit apps packages devShell;
