@@ -46,12 +46,12 @@ class Device:
         self.settings = droidctl.settings.Settings(self)
 
     def __call__(self, cmd, **kwa):
-        r = self.adb.shell(f'({cmd}) && echo - success', **kwa)
-        if not r.endswith('- success\n'):
-            print(f'Execution of command {cmd} has failed:')
-            print(r)
+        r = self.adb.shell2(cmd, **kwa)
+        if r.returncode:
+            print(f'Execution of `{cmd}` has failed with {r.returncode}:')
+            print(r.output)
             sys.exit(1)
-        return r.removesuffix('- success\n')
+        return r
 
     def apply(self, path, *args, _func='run', **kwargs):
         return droidctl.util.apply(self, path, *args, _func=_func, **kwargs)

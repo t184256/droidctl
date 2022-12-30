@@ -15,8 +15,8 @@ class SettingsProxy:
         self.__ns = namespace
 
     def __getitem__(self, name):
-        v = self.__d(f'settings get "{self.__ns}" "{name}"').removesuffix('\n')
-        return v
+        v = self.__d(f'settings get "{self.__ns}" "{name}"').output
+        return v.removesuffix('\n')
 
     def __setitem__(self, name, val):
         self.__d(f'settings put "{self.__ns}" "{name}" "{val}"')
@@ -24,5 +24,5 @@ class SettingsProxy:
 
     def __contains__(self, name):
         # TODO: faster way?
-        r = '\n' + self.__d(f'settings list "{self.__ns}"')
-        return f'\n{name}=' in r
+        r = self.__d(f'settings list "{self.__ns}"').output
+        return f'\n{name}=' in '\n' + r

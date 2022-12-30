@@ -3,4 +3,4 @@ def run(d):
     print('Google Play is installed:',
           'com.android.vending' in d.adb.list_packages())
     print('Orientation:', d.ui.orientation)
-    assert d('echo test') == 'test\n'
+    assert d('echo test').output == 'test\n'
