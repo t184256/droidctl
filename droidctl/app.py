@@ -40,3 +40,12 @@ class App:
     def grant(self, *perms):
         for perm in perms:
             self._d(f'pm grant {self.id_} {perm}')
+
+    def stop(self):
+        self._d(f'am stop-app {self.id_}')
+
+    def launch(self, wait=True):
+        self._d.ui.app_start(self.id_)
+        if wait:
+            self._d.ui.app_wait(self.id_, front=True)
+            assert self._d.ui.info['currentPackageName'] == self.id_
