@@ -52,6 +52,9 @@ class App:
         self._d(f'pm set-permission-flags {self.id_}'
                 ' android.permission.POST_NOTIFICATIONS user-set')
 
+    def allow_unrestricted_battery(self):
+        self._d(f'dumpsys deviceidle whitelist +{self.id_}')
+
     def grant(self, *perms):
         for perm in perms:
             self._d(f'pm grant {self.id_} {perm}')
