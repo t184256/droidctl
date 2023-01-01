@@ -114,6 +114,11 @@ class Permissions:
         self._d(f'pm set-permission-flags {self._id}'
                 ' android.permission.POST_NOTIFICATIONS user-set')
 
+    def disallow_notifications(self):
+        self -= 'android.permission.POST_NOTIFICATIONS'
+        self._d(f'pm set-permission-flags {self._id}'
+                ' android.permission.POST_NOTIFICATIONS user-set')
+
     def allow_unrestricted_battery(self):
         self._d(f'dumpsys deviceidle whitelist +{self._id}')
 
@@ -123,4 +128,12 @@ class Permissions:
 
     def __iadd__(self, perm):
         self._d(f'pm grant {self._id} {perm}')
+        return self
+
+    def revoke(self, *perms):
+        for perm in perms:
+            self -= perm
+
+    def __isub__(self, perm):
+        self._d(f'pm revoke {self._id} {perm}')
         return self
