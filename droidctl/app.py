@@ -3,6 +3,7 @@
 
 import contextlib
 import os
+import re
 import sqlite3
 import tempfile
 import time
@@ -48,6 +49,12 @@ class App:
         else:
             self._d.adb.uninstall(self.id_)
         assert not self.is_installed()
+
+    @property
+    def uid(self):
+        dump = self._d(f'dumpsys package {self.id_}').output
+        assert 'userId=' in dump
+        return int(re.findall(r'userId=(\d+)', dump)[0])
 
     def clear(self):
         self._d(f'pm clear {self.id_}')
