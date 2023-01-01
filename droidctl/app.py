@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import contextlib
-import tempfile
 import time
 import xml.etree.ElementTree as ET
 
@@ -16,6 +15,7 @@ class App:
         self.store = store
         self.url = url
         self.shared_prefs = SharedPrefs(d, id_)
+        self.permissions = Permissions(d, id_)
 
         if autoinstall and (store or url):
             self.install()
@@ -48,17 +48,6 @@ class App:
     def clear(self):
         self._d(f'pm clear {self.id_}')
 
-    def allow_notifications(self):
-        self._d(f'pm set-permission-flags {self.id_}'
-                ' android.permission.POST_NOTIFICATIONS user-set')
-
-    def allow_unrestricted_battery(self):
-        self._d(f'dumpsys deviceidle whitelist +{self.id_}')
-
-    def grant(self, *perms):
-        for perm in perms:
-            self._d(f'pm grant {self.id_} {perm}')
-
     def stop(self):
         self._d(f'am stop-app {self.id_}')
 
@@ -89,3 +78,24 @@ class SharedPrefs:
         self._d.adb.sync.push(xml, tmp_path)
         self._d(f'su -c "cat {tmp_path} > {path}"')
         self._d(f'rm {tmp_path}')
+
+
+class Permissions:
+    def __init__(self, d, id_):
+        self._d = d
+        self._id = id_
+
+    def allow_notifications(self):
+        self._d(f'pm set-permission-flags {self._id}'
+                ' android.permission.POST_NOTIFICATIONS user-set')
+
+    def allow_unrestricted_battery(self):
+        self._d(f'dumpsys deviceidle whitelist +{self._id}')
+
+    def grant(self, *perms):
+        for perm in perms:
+            self += perm
+
+    def __iadd__(self, perm):
+        self._d(f'pm grant {self._id} {perm}')
+        return self
