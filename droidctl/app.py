@@ -70,18 +70,62 @@ class SharedPrefs:
         self._d = d
         self._id = id_
 
-    @contextlib.contextmanager
-    def xml(self, fname):
+    def __getitem__(self, xmlname):
+        return SharedPrefsFile(self._d, self._id, xmlname)
+
+
+class SharedPrefsFile:
+    def __init__(self, d, id_, xmlname):
+        self._d = d
+        self._id = id_
+        self._xmlname = xmlname
+        self._path = f'/data/data/{self._id}/shared_prefs/{self._xmlname}.xml'
+
+    def __enter__(self):
         self._d(f'am stop-app {self._id}')
-        path = f'/data/data/{self._id}/shared_prefs/{fname}'
-        t = self._d(f'su -c "cat {path}"').output
-        xml = ET.fromstring(t)
-        yield xml
-        xml = ET.tostring(xml, encoding='utf8', method='xml')
-        tmp_path = f'/data/local/tmp/{fname}'
-        self._d.adb.sync.push(xml, tmp_path)
-        self._d(f'su -c "cat {tmp_path} > {path}"')
+        t = self._d(f'su -c "cat {self._path}"').output
+        self.xml = ET.fromstring(t)
+        return self
+
+    def __exit__(self, *_):
+        tmp_path = f'/data/local/tmp/{self._xmlname}.xml'
+        s = ET.tostring(self.xml, encoding='utf8', method='xml')
+        self._d.adb.sync.push(s, tmp_path)
+        self._d(f'su -c "cat {tmp_path} > {self._path}"')
         self._d(f'rm {tmp_path}')
+        del self.xml
+
+    def __contains__(self, name):
+        return bool(self.xml.findall(f"./*[@name='{name}']"))
+
+    def __getitem__(self, name):
+        f = self.xml.findall(f"./*[@name='{name}']")
+        if f:
+            f = f[0]
+            if f.tag == 'string':
+                return f.text
+            elif f.tag == 'long':
+                return int(f.attrib['value'])
+            elif f.tag == 'boolean':
+                return f.attrib['value'] == 'true'
+            else:
+                raise NotImplementedError(f'yet unsupported type {f.tag}')
+
+    def __setitem__(self, name, val):
+        f = self.xml.findall(f"./*[@name='{name}']")
+        if f:
+            f = f[0]
+            if f.tag == 'string':
+                f.text = val
+            elif f.tag == 'long':
+                f.attrib['value'] = val
+            elif f.tag == 'boolean':
+                f.attrib['value'] = 'true' if val else 'false'
+            else:
+                raise NotImplementedError(f'yet unsupported type {f.tag}')
+        else:
+            raise NotImplementedError('setting missing properties'
+                                      ' is not implemented yet')
 
 
 class SQLite:
