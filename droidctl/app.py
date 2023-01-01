@@ -2,6 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import contextlib
+import os
+import sqlite3
+import tempfile
 import time
 import xml.etree.ElementTree as ET
 
@@ -15,6 +18,7 @@ class App:
         self.store = store
         self.url = url
         self.shared_prefs = SharedPrefs(d, id_)
+        self.sqlite = SQLite(d, id_)
         self.permissions = Permissions(d, id_)
 
         if autoinstall and (store or url):
@@ -76,6 +80,27 @@ class SharedPrefs:
         xml = ET.tostring(xml, encoding='utf8', method='xml')
         tmp_path = f'/data/local/tmp/{fname}'
         self._d.adb.sync.push(xml, tmp_path)
+        self._d(f'su -c "cat {tmp_path} > {path}"')
+        self._d(f'rm {tmp_path}')
+
+
+class SQLite:
+    def __init__(self, d, id_):
+        self._d = d
+        self._id = id_
+
+    @contextlib.contextmanager
+    def db(self, fname):
+        self._d(f'am stop-app {self._id}')
+        path = f'/data/data/{self._id}/databases/{fname}'
+        tmp_path = f'/data/local/tmp/{fname}'
+        self._d(f'su -c "cat {path}" > {tmp_path}')
+        with tempfile.TemporaryDirectory() as td:
+            tf = os.path.join(td, fname)
+            self._d.adb.sync.pull(tmp_path, tf)
+            with sqlite3.connect(tf) as con:
+                yield con
+            self._d.adb.sync.push(tf, tmp_path)
         self._d(f'su -c "cat {tmp_path} > {path}"')
         self._d(f'rm {tmp_path}')
 
