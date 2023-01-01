@@ -124,8 +124,18 @@ class SharedPrefsFile:
             else:
                 raise NotImplementedError(f'yet unsupported type {f.tag}')
         else:
-            raise NotImplementedError('setting missing properties'
-                                      ' is not implemented yet')
+            if isinstance(val, str):
+                n = ET.SubElement(self.xml, 'string')
+                n.text = val
+            elif isinstance(val, int):
+                n = ET.SubElement(self.xml, 'long')
+                n.attrib['value'] = str(val)
+            elif isinstance(val, bool):
+                n = ET.SubElement(self.xml, 'boolean')
+                n.attrib['value'] = str(val)
+            else:
+                raise NotImplementedError(f'yet unsupported type {type(val)}')
+            n.attrib['name'] = name
 
 
 class SQLite:
