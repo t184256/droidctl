@@ -113,6 +113,8 @@ class SharedPrefsFile:
                 return f.text
             elif f.tag == 'long':
                 return int(f.attrib['value'])
+            elif f.tag == 'float':
+                return float(f.attrib['value'])
             elif f.tag == 'boolean':
                 return f.attrib['value'] == 'true'
             else:
@@ -124,8 +126,8 @@ class SharedPrefsFile:
             f = f[0]
             if f.tag == 'string':
                 f.text = val
-            elif f.tag == 'long':
-                f.attrib['value'] = val
+            elif f.tag in ('long', 'float'):
+                f.attrib['value'] = str(val)
             elif f.tag == 'boolean':
                 f.attrib['value'] = 'true' if val else 'false'
             else:
@@ -136,6 +138,9 @@ class SharedPrefsFile:
                 n.text = val
             elif isinstance(val, int):
                 n = ET.SubElement(self.xml, 'long')
+                n.attrib['value'] = str(val)
+            elif isinstance(val, float):
+                n = ET.SubElement(self.xml, 'float')
                 n.attrib['value'] = str(val)
             elif isinstance(val, bool):
                 n = ET.SubElement(self.xml, 'boolean')
