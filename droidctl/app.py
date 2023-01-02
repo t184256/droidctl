@@ -186,6 +186,13 @@ class Permissions:
         self._d(f'pm set-permission-flags {self._id}'
                 ' android.permission.POST_NOTIFICATIONS user-set')
 
+    def allow_background(self):
+        self._d(f'cmd appops set {self._id} RUN_IN_BACKGROUND allow')
+        # adb shell am make-uid-idle ?
+
+    def disallow_background(self):
+        self._d(f'cmd appops set {self._id} RUN_IN_BACKGROUND ignore')
+
     def allow_unrestricted_battery(self):
         self._d(f'dumpsys deviceidle whitelist +{self._id}')
 
