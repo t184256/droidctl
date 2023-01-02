@@ -136,14 +136,14 @@ class SharedPrefsFile:
             if isinstance(val, str):
                 n = ET.SubElement(self.xml, 'string')
                 n.text = val
+            elif isinstance(val, bool):
+                n = ET.SubElement(self.xml, 'boolean')
+                n.attrib['value'] = str(val)
             elif isinstance(val, int):
                 n = ET.SubElement(self.xml, 'long')
                 n.attrib['value'] = str(val)
             elif isinstance(val, float):
                 n = ET.SubElement(self.xml, 'float')
-                n.attrib['value'] = str(val)
-            elif isinstance(val, bool):
-                n = ET.SubElement(self.xml, 'boolean')
                 n.attrib['value'] = str(val)
             else:
                 raise NotImplementedError(f'yet unsupported type {type(val)}')
