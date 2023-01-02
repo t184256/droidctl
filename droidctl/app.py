@@ -145,6 +145,9 @@ class SharedPrefsFile:
             elif isinstance(val, float):
                 n = ET.SubElement(self.xml, 'float')
                 n.attrib['value'] = str(val)
+            elif isinstance(val, tuple) and len(val) == 2:  # custom type
+                n = ET.SubElement(self.xml, val[0])
+                n.attrib['value'] = str(val[1])
             else:
                 raise NotImplementedError(f'yet unsupported type {type(val)}')
             n.attrib['name'] = name
