@@ -180,12 +180,14 @@ class Permissions:
         self._id = id_
 
     def allow_notifications(self):
-        self += 'android.permission.POST_NOTIFICATIONS'
+        self._d(f'pm grant {self._id} android.permission.POST_NOTIFICATIONS',
+                check=False)
         self._d(f'pm set-permission-flags {self._id}'
                 ' android.permission.POST_NOTIFICATIONS user-set')
 
     def disallow_notifications(self):
-        self -= 'android.permission.POST_NOTIFICATIONS'
+        self._d(f'pm revoke {self._id} android.permission.POST_NOTIFICATIONS',
+                check=False)
         self._d(f'pm set-permission-flags {self._id}'
                 ' android.permission.POST_NOTIFICATIONS user-set')
 
