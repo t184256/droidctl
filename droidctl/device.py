@@ -46,9 +46,9 @@ class Device:
         # Attach adb settings functionality under .settings
         self.settings = droidctl.settings.Settings(self)
 
-    def __call__(self, cmd, **kwa):
+    def __call__(self, cmd, check=True, **kwa):
         r = self.adb.shell2(cmd, **kwa)
-        if r.returncode:
+        if r.returncode and check:
             print(f'Execution of `{cmd}` has failed with {r.returncode}:')
             print(r.output)
             sys.exit(1)
