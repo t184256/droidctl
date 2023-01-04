@@ -37,7 +37,7 @@ class App:
             if not self.is_installed():
                 self.store.install(self.id_)
         elif self.url is not None:
-            self._d.adb.install(self.url)
+            self._d.adb.install(self.url, nolaunch=True)
         else:
             raise NotImplementedError('neither store nor url are specified,'
                                       f' cannot install {self.id_}')
