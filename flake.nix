@@ -72,9 +72,9 @@
           };
           prePatch = ''
             substituteInPlace requirements.txt \
-              --replace 'packaging~=20.3' 'packaging~=21.1'
+              --replace 'packaging~=20.3' 'packaging'
             substituteInPlace requirements.txt \
-              --replace 'adbutils>=0.11.0,<1.0' 'adbutils~=1.2'
+              --replace 'adbutils>=0.11.0,<1.0' 'adbutils'
           '';
           propagatedBuildInputs = with pkgs.python3Packages; [
             adbutils
