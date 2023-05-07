@@ -182,14 +182,16 @@ class Permissions:
     def allow_notifications(self):
         self._d(f'pm grant {self._id} android.permission.POST_NOTIFICATIONS',
                 check=False)
-        self._d(f'pm set-permission-flags {self._id}'
-                ' android.permission.POST_NOTIFICATIONS user-set')
+        if self._d.android_version > 12:
+            self._d(f'pm set-permission-flags {self._id}'
+                    ' android.permission.POST_NOTIFICATIONS user-set')
 
     def disallow_notifications(self):
         self._d(f'pm revoke {self._id} android.permission.POST_NOTIFICATIONS',
                 check=False)
-        self._d(f'pm set-permission-flags {self._id}'
-                ' android.permission.POST_NOTIFICATIONS user-set')
+        if self._d.android_version > 12:
+            self._d(f'pm set-permission-flags {self._id}'
+                    ' android.permission.POST_NOTIFICATIONS user-set')
 
     def allow_background(self):
         self._d(f'cmd appops set {self._id} RUN_IN_BACKGROUND allow')
