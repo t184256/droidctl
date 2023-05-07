@@ -211,7 +211,10 @@ class Permissions:
             self += perm
 
     def __iadd__(self, perm):
-        self._d(f'pm grant {self._id} {perm}')
+        r = self._d.adb.shell2(f'pm grant {self._id} {perm}')
+        if 'is not a changeable permission type' in r.output:
+            perm = perm.removeprefix('android.permission.')
+            self._d(f'appops set {self._id} {perm} allow')
         return self
 
     def revoke(self, *perms):
@@ -219,5 +222,8 @@ class Permissions:
             self -= perm
 
     def __isub__(self, perm):
-        self._d(f'pm revoke {self._id} {perm}')
+        r = self._d.adb.shell2(f'pm revoke {self._id} {perm}')
+        if 'is not a changeable permission type' in r.output:
+            perm = perm.removeprefix('android.permission.')
+            self._d(f'appops set {self._id} {perm} ignore')
         return self
