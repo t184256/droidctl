@@ -60,7 +60,10 @@ class App:
         self._d(f'pm clear {self.id_}')
 
     def stop(self):
-        self._d(f'am stop-app {self.id_}')
+        if self._d.android_version > 12:
+            self._d(f'am stop-app {self.id_}')
+        else:
+            self._d(f'am force-stop {self.id_}')
 
     def launch(self, wait=True):
         self._d.ui.app_start(self.id_)
@@ -89,7 +92,7 @@ class SharedPrefsFile:
         self._path = f'/data/data/{self._id}/shared_prefs/{self._xmlname}.xml'
 
     def __enter__(self):
-        self._d(f'am stop-app {self._id}')
+        self._d.app(self._id).stop()
         t = self._d(f'su -c "cat {self._path}"').output
         self.xml = ET.fromstring(t)
         return self
@@ -160,7 +163,7 @@ class SQLite:
 
     @contextlib.contextmanager
     def db(self, fname):
-        self._d(f'am stop-app {self._id}')
+        self._d.app(self._id).stop()
         path = f'/data/data/{self._id}/databases/{fname}'
         tmp_path = f'/data/local/tmp/{fname}'
         self._d(f'su -c "cat {path}" > {tmp_path}')
