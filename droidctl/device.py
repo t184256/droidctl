@@ -37,6 +37,11 @@ class Device:
             assert id_c == id_, f'Wrong device {id_c} is not {id_}!'
         self.name = id_c
 
+        # Query android version + verify that ADB works
+        self.android_version = int(self(
+            'getprop ro.build.version.release'
+        ).output)
+
         # Attach uiautomator2 functionality under .ui
         self.ui = uiautomator2.connect(id_c)
 
