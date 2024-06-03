@@ -46,10 +46,10 @@
         # adbutils, dependency of uiautomator2
         adbutils = pkgs.python3Packages.buildPythonPackage rec {
           pname = "adbutils";
-          version = "1.2.2";
+          version = "2.7.2";
           src = pkgs.python3Packages.fetchPypi {
             inherit pname version;
-            sha256 = "sha256-6lnnr+4gqBlHDM2whbK+/OjWhhyrwLXAWpaFDj0w980=";
+            sha256 = "sha256-7ooUSEUxgktorqRUyjR01n0eCPJUhH8+CNtKa3yWTbg=";
           };
           propagatedBuildInputs = with pkgs.python3Packages; [
             pbr
@@ -57,6 +57,7 @@
             whichcraft
             requests
             apkutils2
+            setuptools
           ];
           PBR_VERSION = version;
           doCheck = false;
@@ -65,10 +66,10 @@
         # uiautomator2
         uiautomator2 = pkgs.python3Packages.buildPythonPackage rec {
           pname = "uiautomator2";
-          version = "2.16.12";
+          version = "2.16.26";
           src = pkgs.python3Packages.fetchPypi {
             inherit pname version;
-            sha256 = "sha256-hL1JdmlAkUnRRRersAN2zZQ8iwGhb970zslPU+u7lCk=";
+            sha256 = "sha256-mXcrlwgXFZBF3fTRQYO8HcvShM4/U6UDd+pcZCBEIMI=";
           };
           prePatch = ''
             substituteInPlace requirements.txt \
