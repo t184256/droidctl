@@ -110,7 +110,7 @@
           doCheck = false;
         };
 
-        droidctl = pkgs.python3Packages.buildPythonPackage {
+        droidctl = pkgs.python3Packages.buildPythonApplication {
           pname = "droidctl";
           version = "0.0.1";
           src = ./.;
