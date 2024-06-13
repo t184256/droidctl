@@ -106,7 +106,7 @@
             sha256 = "sha256-wEP4Ed2G4OTfTD+sayWMPUGmdzxcmJYoBp8MKbxvrOc=";
           };
 
-          vendorHash = "sha256-uwfVjSXSroIY2xv1ETTGv1TxfMXaFL9IQ1wcMzh5/jY=";
+          vendorHash = "sha256-7ApthWHxD29p0U/6ygyrsNQsy2dVdbA/zE7D4DsuqoU=";
           doCheck = false;
         };
 
