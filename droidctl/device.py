@@ -36,6 +36,7 @@ class Device:
         if id_:
             assert id_c == id_, f'Wrong device {id_c} is not {id_}!'
         self.name = id_c
+        self._su_c = None
 
         # Query android version + verify that ADB works
         self.android_version = int(self(
@@ -53,6 +54,33 @@ class Device:
 
     def __call__(self, cmd, check=True, **kwa):
         r = self.adb.shell2(cmd, **kwa)
+        if r.returncode and check:
+            print(f'Execution of `{cmd}` has failed with {r.returncode}:')
+            print(r.output)
+            sys.exit(1)
+        return r
+
+    def _determine_su_style(self):
+        if self._su_c is None:
+            r = self.adb.shell2(['su', '-c', 'true'])
+            if r.returncode == 0 and 'invalid uid/gid' not in r.output:
+                self._su = ['su', '-c']
+                return self._su
+            # Could be dumb su, trying a different invocation style
+            r = self.adb.shell2(['su', '0', 'true'])
+            if r.returncode == 0:
+                self._su = ['su', '0', 'sh', '-c']
+                return self._su
+            raise RuntimeError('cannot determine whether su is dumb, '
+                               'is su working?')
+
+    def su(self, cmd, check=True, **kwa):
+        # might have quoting issues
+        if not isinstance(cmd, str):
+            # works with the 'su 0' style, but not with 'su -c' style su
+            raise RuntimeError('`.su()` only takes strings')
+        su = self._determine_su_style()
+        r = self.adb.shell2(su + [cmd], **kwa)
         if r.returncode and check:
             print(f'Execution of `{cmd}` has failed with {r.returncode}:')
             print(r.output)

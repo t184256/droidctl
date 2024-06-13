@@ -93,7 +93,7 @@ class SharedPrefsFile:
 
     def __enter__(self):
         self._d.app(self._id).stop()
-        t = self._d(f'su -c "cat {self._path}"').output
+        t = self._d.su(f'cat {self._path}').output
         self.xml = ET.fromstring(t)
         return self
 
@@ -101,8 +101,8 @@ class SharedPrefsFile:
         tmp_path = f'/data/local/tmp/{self._xmlname}.xml'
         s = ET.tostring(self.xml, encoding='utf8', method='xml')
         self._d.adb.sync.push(s, tmp_path)
-        self._d(f'su -c "cat {tmp_path} > {self._path}"')
-        self._d(f'rm {tmp_path}')
+        self._d.su(f'cat {tmp_path} > {self._path}')
+        self._d(['rm', tmp_path])
         del self.xml
 
     def __contains__(self, name):
@@ -166,15 +166,15 @@ class SQLite:
         self._d.app(self._id).stop()
         path = f'/data/data/{self._id}/databases/{fname}'
         tmp_path = f'/data/local/tmp/{fname}'
-        self._d(f'su -c "cat {path}" > {tmp_path}')
+        self._d.su(f'cat {path} > {tmp_path}')
         with tempfile.TemporaryDirectory() as td:
             tf = os.path.join(td, fname)
             self._d.adb.sync.pull(tmp_path, tf)
             with sqlite3.connect(tf) as con:
                 yield con
             self._d.adb.sync.push(tf, tmp_path)
-        self._d(f'su -c "cat {tmp_path} > {path}"')
-        self._d(f'rm {tmp_path}')
+        self._d.su(f'cat {tmp_path} > {path}')
+        self._d(['rm', tmp_path])
 
 
 class Permissions:
