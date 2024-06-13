@@ -1,0 +1,63 @@
+on: [pull_request, push]
+
+jobs:
+  emulator-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        api-level: [29]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main  # also enables KVM
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix build
+
+      - name: Configure AVD cache
+        uses: actions/cache@v4
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
+
+      - name: Create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Configure fdroidcl cache
+        uses: actions/cache@v4
+        id: fdroidcl-cache
+        with:
+          path: |
+            ~/.cache/fdroidcl
+            ~/.config/fdroidcl
+          key: fdroidcl-cache
+
+      - name: Create fdroidcl cache
+        if: steps.fdroidcl-cache.outputs.cache-hit != 'true'
+        run: nix run '.#fdroidcl' -- update
+
+      - name: Run examples with api-level=${{ matrix.api-level }}
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          target: default
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          script: |
+            # more trivial ones
+            nix run . -- run examples/su.py
+            nix run . -- run examples/trivial.py
+            nix run . -- run examples/settings.py
+            # more involved ones
+            nix run . -- run examples/automator.py
+            nix run . -- run examples/fdroid.py
+            nix run . -- run examples/satstat.py
