@@ -66,17 +66,16 @@
         # uiautomator2
         uiautomator2 = pkgs.python3Packages.buildPythonPackage rec {
           pname = "uiautomator2";
-          version = "2.16.26";
+          version = "3.1.0";
+          format = "pyproject";
           src = pkgs.python3Packages.fetchPypi {
             inherit pname version;
-            sha256 = "sha256-mXcrlwgXFZBF3fTRQYO8HcvShM4/U6UDd+pcZCBEIMI=";
+            sha256 = "sha256-CJ1bWx1Gy4gCNvgX9jNdFPgp4Z7QJpjs0Wl6bBCwZMs=";
           };
-          prePatch = ''
-            substituteInPlace requirements.txt \
-              --replace 'packaging~=20.3' 'packaging'
-            substituteInPlace requirements.txt \
-              --replace 'adbutils>=0.11.0,<1.0' 'adbutils'
-          '';
+          nativeBuildInputs = with pkgs.python3Packages; [
+            poetry-core
+            poetry-dynamic-versioning
+          ];
           propagatedBuildInputs = with pkgs.python3Packages; [
             adbutils
             pbr
@@ -91,7 +90,7 @@
             deprecated
           ];
           doCheck = false;
-          PBR_VERSION = version;
+          #PBR_VERSION = version;
         };
 
         # fdroidcl
