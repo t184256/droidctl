@@ -95,17 +95,17 @@
         # fdroidcl
         fdroidcl = pkgs.buildGoModule rec {
           pname = "fdroidcl";
-          version = "0.5.0";
+          version = "0.7.0.master.2023-09-13";
 
           src = pkgs.fetchFromGitHub {
             owner = "mvdan";
             repo = pname;
-            rev = "v${version}";
-            sha256 = "sha256-wEP4Ed2G4OTfTD+sayWMPUGmdzxcmJYoBp8MKbxvrOc=";
+            rev = "d8882fc307b4173c45a76f7803b0bd23f9d8aa58";
+            sha256 = "sha256-I4jw6zqWfnCAhkNgOnb8+a2dOOUp5amsH5nxv8TALnw=";
           };
 
-          vendorHash = "sha256-7ApthWHxD29p0U/6ygyrsNQsy2dVdbA/zE7D4DsuqoU=";
-          doCheck = false;
+          vendorHash = "sha256-UNlSQZS6tC8bD3/y1tB9msKaWRjvLrwnmUZv7OFHgnA=";
+          doCheck = false;  # tests run against a real online repo
         };
 
         droidctl = pkgs.python3Packages.buildPythonApplication {
