@@ -90,7 +90,6 @@
             deprecated
           ];
           doCheck = false;
-          #PBR_VERSION = version;
         };
 
         # fdroidcl
