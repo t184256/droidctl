@@ -93,7 +93,16 @@ class SharedPrefsFile:
 
     def __enter__(self):
         self._d.app(self._id).stop()
-        t = self._d.su(f'cat {self._path}').output
+        r = self._d.su(f'cat {self._path}', check=False)
+        # Wait for the file a bit if it's not there yet
+        if r.returncode != 0:
+            for i in range(10):
+                time.sleep(.25)
+                r = self._d.su(f'cat {self._path}', check=False)
+                if r.returncode == 0:
+                    break
+        assert r.returncode == 0, 'shared_prefs file could not be read'
+        t = r.output
         self.xml = ET.fromstring(t)
         return self
 

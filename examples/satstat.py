@@ -15,7 +15,7 @@ def run(d):
     print('menu')
     d.ui.press('back')
 
-    # Now we have the settings file generated and we can edit it
+    # Now we should have the settings file generated and we can edit it
     with satstat.shared_prefs[f'{satstat.id_}_preferences'] as p:
         # Auto-update on all networks, example of low-level XML work
         un = p.xml.findall("./set[@name='pref_update_networks']")[0]
