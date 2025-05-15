@@ -117,7 +117,7 @@
             click
             fdroidcl
           ] ++ (with pkgs; [
-            androidenv.androidPkgs.platform-tools
+            android-tools
           ]);
           doCheck = false;
         };
